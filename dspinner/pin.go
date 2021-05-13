@@ -140,7 +140,7 @@ func New(ctx context.Context, dstore ds.Datastore, dserv ipld.DAGService) (ipfsp
 		dstore:    dstore,
 	}
 
-	data, err := dstore.Get(dirtyKey)
+	data, err := dstore.Get(ctx, dirtyKey)
 	if err != nil {
 		if err == ds.ErrNotFound {
 			return p, nil
@@ -272,7 +272,7 @@ func (p *pinner) addPin(ctx context.Context, c cid.Cid, mode ipfspinner.Mode, na
 	}
 
 	// Store the pin.  Pin must be stored after index for recovery to work.
-	err = p.dstore.Put(pp.dsKey(), pinData)
+	err = p.dstore.Put(ctx, pp.dsKey(), pinData)
 	if err != nil {
 		if mode == ipfspinner.Recursive {
 			p.cidRIndex.Delete(ctx, c.KeyString(), pp.Id)
@@ -293,7 +293,7 @@ func (p *pinner) removePin(ctx context.Context, pp *pin) error {
 
 	// Remove pin from datastore.  Pin must be removed before index for
 	// recovery to work.
-	err := p.dstore.Delete(pp.dsKey())
+	err := p.dstore.Delete(ctx, pp.dsKey())
 	if err != nil {
 		return err
 	}
@@ -616,7 +616,7 @@ func (p *pinner) removePinsForCid(ctx context.Context, c cid.Cid, mode ipfspinne
 
 // loadPin loads a single pin from the datastore.
 func (p *pinner) loadPin(ctx context.Context, pid string) (*pin, error) {
-	pinData, err := p.dstore.Get(ds.NewKey(path.Join(pinKeyPath, pid)))
+	pinData, err := p.dstore.Get(ctx, ds.NewKey(path.Join(pinKeyPath, pid)))
 	if err != nil {
 		return nil, err
 	}
@@ -628,7 +628,7 @@ func (p *pinner) loadAllPins(ctx context.Context) ([]*pin, error) {
 	q := query.Query{
 		Prefix: pinKeyPath,
 	}
-	results, err := p.dstore.Query(q)
+	results, err := p.dstore.Query(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -838,7 +838,7 @@ func (p *pinner) Flush(ctx context.Context) error {
 	}
 
 	// Sync pins and indexes
-	if err := p.dstore.Sync(ds.NewKey(basePath)); err != nil {
+	if err := p.dstore.Sync(ctx, ds.NewKey(basePath)); err != nil {
 		return fmt.Errorf("cannot sync pin state: %v", err)
 	}
 
@@ -938,6 +938,6 @@ func (p *pinner) setDirty(ctx context.Context, dirty bool) {
 	if dirty {
 		data[0] = 1
 	}
-	p.dstore.Put(dirtyKey, data)
-	p.dstore.Sync(dirtyKey)
+	p.dstore.Put(ctx, dirtyKey, data)
+	p.dstore.Sync(ctx, dirtyKey)
 }

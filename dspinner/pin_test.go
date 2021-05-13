@@ -299,7 +299,7 @@ func TestPinnerBasic(t *testing.T) {
 	if pp.Cid != ak {
 		t.Error("loaded pin has wrong cid")
 	}
-	err = dsp.dstore.Delete(pp.dsKey())
+	err = dsp.dstore.Delete(ctx, pp.dsKey())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -665,7 +665,7 @@ func TestLoadDirty(t *testing.T) {
 	cidRIndex.Add(ctx, cidBKey, "not-a-pin-id")
 
 	// Verify dirty
-	data, err := dstore.Get(dirtyKey)
+	data, err := dstore.Get(ctx, dirtyKey)
 	if err != nil {
 		t.Fatalf("could not read dirty flag: %v", err)
 	}
@@ -688,7 +688,7 @@ func TestLoadDirty(t *testing.T) {
 	}
 
 	// Verify not dirty
-	data, err = dstore.Get(dirtyKey)
+	data, err = dstore.Get(ctx, dirtyKey)
 	if err != nil {
 		t.Fatalf("could not read dirty flag: %v", err)
 	}
@@ -920,7 +920,7 @@ func BenchmarkLoadRebuild(b *testing.B) {
 
 	b.Run("RebuildTrue", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dstore.Put(dirtyKey, []byte{1})
+			dstore.Put(ctx, dirtyKey, []byte{1})
 
 			_, err = New(ctx, dstore, dserv)
 			if err != nil {
@@ -931,7 +931,7 @@ func BenchmarkLoadRebuild(b *testing.B) {
 
 	b.Run("RebuildFalse", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dstore.Put(dirtyKey, []byte{0})
+			dstore.Put(ctx, dirtyKey, []byte{0})
 
 			_, err = New(ctx, dstore, dserv)
 			if err != nil {

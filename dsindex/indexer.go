@@ -75,7 +75,7 @@ func (x *indexer) Add(ctx context.Context, key, value string) error {
 		return ErrEmptyValue
 	}
 	dsKey := ds.NewKey(encode(key)).ChildString(encode(value))
-	return x.dstore.Put(dsKey, []byte{})
+	return x.dstore.Put(ctx, dsKey, []byte{})
 }
 
 func (x *indexer) Delete(ctx context.Context, key, value string) error {
@@ -85,7 +85,7 @@ func (x *indexer) Delete(ctx context.Context, key, value string) error {
 	if value == "" {
 		return ErrEmptyValue
 	}
-	return x.dstore.Delete(ds.NewKey(encode(key)).ChildString(encode(value)))
+	return x.dstore.Delete(ctx, ds.NewKey(encode(key)).ChildString(encode(value)))
 }
 
 func (x *indexer) DeleteKey(ctx context.Context, key string) (int, error) {
@@ -108,7 +108,7 @@ func (x *indexer) ForEach(ctx context.Context, key string, fn func(key, value st
 		Prefix:   key,
 		KeysOnly: true,
 	}
-	results, err := x.dstore.Query(q)
+	results, err := x.dstore.Query(ctx, q)
 	if err != nil {
 		return err
 	}
@@ -153,7 +153,7 @@ func (x *indexer) HasValue(ctx context.Context, key, value string) (bool, error)
 	if value == "" {
 		return false, ErrEmptyValue
 	}
-	return x.dstore.Has(ds.NewKey(encode(key)).ChildString(encode(value)))
+	return x.dstore.Has(ctx, ds.NewKey(encode(key)).ChildString(encode(value)))
 }
 
 func (x *indexer) HasAny(ctx context.Context, key string) (bool, error) {
@@ -246,7 +246,7 @@ func (x *indexer) deletePrefix(ctx context.Context, prefix string) (int, error) 
 	}
 
 	for i := range ents {
-		err = x.dstore.Delete(ds.NewKey(ents[i].Key))
+		err = x.dstore.Delete(ctx, ds.NewKey(ents[i].Key))
 		if err != nil {
 			return 0, err
 		}
@@ -260,7 +260,7 @@ func (x *indexer) queryPrefix(ctx context.Context, prefix string) ([]query.Entry
 		Prefix:   prefix,
 		KeysOnly: true,
 	}
-	results, err := x.dstore.Query(q)
+	results, err := x.dstore.Query(ctx, q)
 	if err != nil {
 		return nil, err
 	}
