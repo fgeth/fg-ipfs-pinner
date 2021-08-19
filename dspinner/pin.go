@@ -150,13 +150,16 @@ func New(ctx context.Context, dstore ds.Datastore, dserv ipld.DAGService) (*pinn
 		return nil, fmt.Errorf("cannot load dirty flag: %v", err)
 	}
 	if data[0] == 1 {
-		p.dirty = 1
-
-		err = p.rebuildIndexes(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("cannot rebuild indexes: %v", err)
-		}
+		log.Error("WARNING: PINSET INDEXES NEED TO BE REBUILT, BUT FUNCTIONALITY IS MANUALLY DISABLED ON THIS NODE")
 	}
+
+	// 	p.dirty = 1
+
+	// 	err = p.rebuildIndexes(ctx)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("cannot rebuild indexes: %v", err)
+	// 	}
+	// }
 
 	return p, nil
 }
