@@ -822,7 +822,7 @@ func (p *pinner) Flush(ctx context.Context) error {
 		return err
 	}
 
-	return p.flushPins(ctx, true)
+	return p.flushPins(ctx, false)
 }
 
 // PinWithMode allows the user to have fine grained control over pin
