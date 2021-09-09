@@ -797,6 +797,53 @@ func TestEncodeDecodePin(t *testing.T) {
 	}
 }
 
+func TestRemoveAll(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	dstore := dssync.MutexWrap(ds.NewMapDatastore())
+	bstore := blockstore.NewBlockstore(dstore)
+	bserv := bs.New(bstore, offline.Exchange(bstore))
+
+	dserv := mdag.NewDAGService(bserv)
+	p, err := New(ctx, dstore, dserv)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nodes := makeNodes(3, dserv)
+	for i := range nodes {
+		// Pin the cid
+		_, err := p.addPin(ctx, nodes[i].Cid(), ipfspin.Recursive, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	err = p.Flush(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i := range nodes {
+		assertPinned(t, p, nodes[i].Cid(), "expected key to be pinned")
+	}
+
+	pinCount, err := p.RemoveAll(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pinCount != len(nodes) {
+		t.Fatal("expected", len(nodes), "pins deleted, got", pinCount)
+	}
+
+	for i := range nodes {
+		assertUnpinned(t, p, nodes[i].Cid(), "expected key to not be pinned")
+	}
+
+	t.Logf("Deleted %d pins", pinCount)
+}
+
 func makeTree(ctx context.Context, aBranchLen int, dserv ipld.DAGService, p ipfspin.Pinner) (aKeys []cid.Cid, bk cid.Cid, ck cid.Cid, err error) {
 	if aBranchLen < 3 {
 		err = errors.New("set aBranchLen to at least 3")

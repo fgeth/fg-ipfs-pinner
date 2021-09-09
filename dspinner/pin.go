@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"strings"
 	"sync"
 
 	"github.com/ipfs/go-cid"
@@ -853,6 +854,43 @@ func (p *pinner) PinWithMode(c cid.Cid, mode ipfspinner.Mode) {
 	if err = p.flushPins(ctx, false); err != nil {
 		log.Errorf("failed to create %s pin: %s", mode, err)
 	}
+}
+
+// RemoveAll removes all pins and indexes, and returns a count of the number of
+// pins removed
+func (p *pinner) RemoveAll(ctx context.Context) (int, error) {
+	q := query.Query{
+		Prefix:   basePath,
+		KeysOnly: true,
+	}
+	results, err := p.dstore.Query(q)
+	if err != nil {
+		return 0, err
+	}
+	defer results.Close()
+
+	var pinCount int
+	for r := range results.Next() {
+		if ctx.Err() != nil {
+			return 0, ctx.Err()
+		}
+		if r.Error != nil {
+			return 0, fmt.Errorf("cannot read entry: %v", r.Error)
+		}
+		err = p.dstore.Delete(ds.NewKey(r.Entry.Key))
+		if err != nil {
+			return 0, err
+		}
+		if strings.HasPrefix(r.Entry.Key, pinKeyPath) {
+			pinCount++
+		}
+	}
+
+	if err = p.flushPins(ctx, true); err != nil {
+		return 0, err
+	}
+
+	return pinCount, nil
 }
 
 // hasChild recursively looks for a Cid among the children of a root Cid.

@@ -130,6 +130,10 @@ type Pinner interface {
 	// InternalPins returns all cids kept pinned for the internal state of the
 	// pinner
 	InternalPins(ctx context.Context) ([]cid.Cid, error)
+
+	// RemoveAll removes all pins and indexes, and returns a count of the number of
+	// pins removed
+	RemoveAll(ctx context.Context) (int, error)
 }
 
 // Pinned represents CID which has been pinned with a pinning strategy.
