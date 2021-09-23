@@ -17,10 +17,10 @@ import (
 	"github.com/ipfs/go-datastore/query"
 	dssync "github.com/ipfs/go-datastore/sync"
 	lds "github.com/ipfs/go-ds-leveldb"
-	blockstore "github.com/ipfs/go-ipfs-blockstore"
+	blockstore "github.com/fgeth/fg-ipfs-blockstore"
 	offline "github.com/ipfs/go-ipfs-exchange-offline"
-	ipfspin "github.com/ipfs/go-ipfs-pinner"
-	util "github.com/ipfs/go-ipfs-util"
+	ipfspin "github.com/fgeth/fg-ipfs-pinner"
+	util "github.com/fgeth/fg-ipfs-util"
 	ipld "github.com/ipfs/go-ipld-format"
 	logging "github.com/ipfs/go-log"
 )

@@ -9,7 +9,7 @@ import (
 	ds "github.com/ipfs/go-datastore"
 	bds "github.com/ipfs/go-ds-badger"
 	lds "github.com/ipfs/go-ds-leveldb"
-	blockstore "github.com/ipfs/go-ipfs-blockstore"
+	blockstore "github.com/fgeth/fg-ipfs-blockstore"
 	offline "github.com/ipfs/go-ipfs-exchange-offline"
 	ipld "github.com/ipfs/go-ipld-format"
 	mdag "github.com/ipfs/go-merkledag"

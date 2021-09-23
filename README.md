@@ -15,14 +15,14 @@ The pinner system is responsible for keeping track of which objects a user wants
 Via `go get`:
 
 ```sh
-$ go get github.com/ipfs/go-ipfs-pinner
+$ go get github.com/fgeth/fg-ipfs-pinner
 ```
 
 > Requires Go 1.13
 
 ## Documentation
 
-https://godoc.org/github.com/ipfs/go-ipfs-pinner
+https://godoc.org/github.com/fgeth/fg-ipfs-pinner
 
 ## Contribute
 
